@@ -1,65 +1,84 @@
-![docker hub](https://img.shields.io/docker/pulls/richarvey/nginx-php-fpm.svg?style=flat-square)
-![docker hub](https://img.shields.io/docker/stars/richarvey/nginx-php-fpm.svg?style=flat-square)
+![docker hub](https://img.shields.io/docker/pulls/artsafin/nginx-php-fpm.svg?style=flat-square)
+![docker hub](https://img.shields.io/docker/stars/artsafin/nginx-php-fpm.svg?style=flat-square)
 
 ## Overview
-This is a Dockerfile/image to build a container for nginx and php-fpm, with the ability to pull website code from git when the container is created, as well as allowing the container to push and pull changes to the code to and from git. The container also has the ability to update templated files with variables passed to docker in order to update your code and settings. There is support for lets encrypt SSL configurations, custom nginx configs, core nginx/PHP variable overrides for running preferences, X-Forwarded-For headers and UID mapping for local volume support.
+A minimal image with php-fpm and nginx fitting perfectly for development.
+The image installs only necessary software and fully configurable (see below).
 
-If you have improvements or suggestions please open an issue or pull request on the GitHub project page.
+The list of software:
+- nginx 1.13
+- php 7.1
+- PHP extensions: pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache
+- composer
 
-### Versioning
-| Docker Tag | GitHub Release | Nginx Version | PHP Version | Alpine Version |
-|-----|-------|-----|--------|--------|
-| latest | Master Branch |1.13.7 | 7.1.12 | 3.4 |
-
-For other tags please see: [versioning](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/versioning.md)
-
-### Links
-- [https://github.com/richarvey/nginx-php-fpm](https://github.com/richarvey/nginx-php-fpm)
-- [https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/](https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/)
+Based on [https://github.com/richarvey/nginx-php-fpm](https://github.com/richarvey/nginx-php-fpm)
 
 ## Quick Start
 To pull from docker hub:
 ```
-docker pull richarvey/nginx-php-fpm:latest
+docker pull artsafin/nginx-php-fpm:latest
 ```
-### Running
+
+### Running standalone image
 To simply run the container:
 ```
-sudo docker run -d richarvey/nginx-php-fpm
-```
-To dynamically pull code from git when starting:
-```
-docker run -d -e 'GIT_EMAIL=email_address' -e 'GIT_NAME=full_name' -e 'GIT_USERNAME=git_username' -e 'GIT_REPO=github.com/project' -e 'GIT_PERSONAL_TOKEN=<long_token_string_here>' richarvey/nginx-php-fpm:latest
+docker run -d -v<FILES>:/app -p80:80 -p443:443 artsafin/nginx-php-fpm
 ```
 
-You can then browse to ```http://<DOCKER_HOST>``` to view the default install files. To find your ```DOCKER_HOST``` use the ```docker inspect``` to get the IP address (normally 172.17.0.2)
+### Running image as part of docker-compose
 
-For more detailed examples and explanations please refer to the documentation.
-## Documentation
+Create a docker-compose.yml file with the following contents:
 
-- [Building from source](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/building.md)
-- [Versioning](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/versioning.md)
-- [Config Flags](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/config_flags.md)
-- [Git Auth](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/git_auth.md)
- - [Personal Access token](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/git_auth.md#personal-access-token)
- - [SSH Keys](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/git_auth.md#ssh-keys)
-- [Git Commands](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/git_commands.md)
- - [Push](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/git_commands.md#push-code-to-git)
- - [Pull](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/git_commands.md#pull-code-from-git-refresh)
-- [Repository layout / webroot](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/repo_layout.md)
- - [webroot](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/repo_layout.md#src--webroot)
-- [User / Group Identifiers](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/UID_GID_Mapping.md)
-- [Custom Nginx Config files](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/nginx_configs.md)
- - [REAL IP / X-Forwarded-For Headers](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/nginx_configs.md#real-ip--x-forwarded-for-headers)
-- [Scripting and Templating](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/scripting_templating.md)
- - [Environment Variables](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/scripting_templating.md#using-environment-variables--templating)
-- [Lets Encrypt Support](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/lets_encrypt.md)
- - [Setup](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/lets_encrypt.md#setup)
- - [Renewal](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/lets_encrypt.md#renewal)
-- [PHP Modules](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/php_modules.md)
-- [Xdebug](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/xdebug.md)
-- [Logging and Errors](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/logs.md)
+```
+version: '3'
 
-## Guides
-- [Running in Kubernetes](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/guides/kubernetes.md)
-- [Using Docker Compose](https://github.com/richarvey/nginx-php-fpm/blob/master/docs/guides/docker_compose.md)
+services:
+  nginx-php-fpm:
+    image: artsafin/nginx-php-fpm:latest
+    restart: always
+    environment:
+    volumes:
+        -<FILES>:/app
+```
+
+## Configuration
+
+### Configuration files
+
+Docker allows replacing and adding new files via volumes.
+
+The following files and directories are considered by nginx or php-fpm:
+
+| Image destination path | Source | Description |
+|-----------------------------------------------|--------------------------|-----------------------------------------------------|
+| /etc/supervisord.conf | conf/supervisord.conf | Supervisord main config |
+| /etc/supervisor/conf.d/ |  | Additional supervisord configuration files (*.conf) |
+| /etc/nginx/nginx.conf | conf/nginx.conf | Nginx main config |
+| /etc/nginx/conf.d/default-site.conf | conf/default-site.conf | Nginx default site config |
+| /etc/nginx/conf.d/ |  | Additional nginx configuration files (*.conf) |
+| /usr/local/etc/php/conf.d/php-docker-vars.ini | conf/php-docker-vars.ini | php.ini overrides |
+| /usr/local/etc/php/conf.d/ |  | Additional php configuration files (*.ini) |
+| /usr/local/etc/php-fpm.d/php-fpm-pool.conf | conf/php-fpm-pool.conf | php-fpm pool config |
+| /usr/local/etc/php-fpm.conf |  | Default php-fpm config |
+
+### Environment variables
+
+The following variables can be passed either as `docker run ... -e 'NAME=VALUE' artsafin/nginx-php-fpm` or using `docker-compose.yml`'s `environment` section:
+```
+...
+    environment:
+        - NAME=VALUE
+...
+
+```
+
+| Name | Description | Default | Example |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
+| WEBROOT | Document root for the default nginx site.<br>Applied only if the image is run with default nginx site configuration. | /app | `-e 'WEBROOT=/app/public'`<br>`environment:<br>     - 'WEBROOT=/app/public'` |
+| XDEBUG_CONFIG | Configuration for Xdebug.<br>Though xdebug extension is installed, it is not enabled for performance reasons unless XDEBUG_CONFIG is set.<br>The contents of XDEBUG_CONFIG variable are read by the xdebug extension itself, see [Xdebug documentation](https://xdebug.org/docs/remote#starting) for more info. | not set | `-e 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'`<br>`environment:<br>    - 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'` |
+| PHP_IDE_SERVER_NAME | Server name needed to enable debugging in IDE.<br> Applied only if XDEBUG_CONFIG is set.<br> Unless PHP_IDE_CONFIG is set, this variable will be used to produce `PHP_IDE_CONFIG='serverName=PHP_IDE_SERVER_NAME'` | docker | `-e 'PHP_IDE_SERVER_NAME=site'`<br> `environment:<br>    - 'PHP_IDE_SERVER_NAME=site'` |
+
+### Links
+- [Github](https://github.com/artsafin/nginx-php-fpm)
+- [Docker hub](https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/)
+- [https://github.com/richarvey/nginx-php-fpm](https://github.com/richarvey/nginx-php-fpm)

@@ -1,20 +1,68 @@
 #!/bin/bash
 
-# Lets Encrypt
-if [ -z "$WEBROOT" ] || [ -z "$GIT_EMAIL" ] || [ -z "$DOMAIN" ]; then
- echo "You need the \$WEBROOT, \$GIT_EMAIL and the \$DOMAIN Variables"
+usage() {
+    echo Usage:
+    echo "  $0 <CERT_EMAIL> <CERT_DOMAIN> [--help|-h] [-w<WEBROOT>|--webroot=<WEBROOT>] [-s|--skip-nginx]"
+    echo
+    echo "Sets up a new Let's Encrypt certificate"
+    echo
+    echo "  Options:"
+    echo "    --help Print this help"
+    echo "    --webroot Set web root. If omitted the container WEBROOT variable is used"
+    echo "    --skip-nginx Skip replacing ##SSL_DOMAIN## variable and uncommenting ssl include in nginx default configuration"
+    echo
+    echo "  Required arguments:"
+    echo "    <CERT_EMAIL> - Certificate email"
+    echo "    <CERT_DOMAIN> - Certificate domain"
+    echo
+    exit 1
+}
+
+OPTS=`getopt -o w:sh --long webroot:,skip-nginx,help -n "$0" -- "$@"`
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -h | --help ) usage ;;
+    -w | --webroot ) WEBROOT="$2"; shift; shift ;;
+    -s | --skip-nginx ) SKIP_NGINX=1; shift ;;
+    -- )
+        shift
+        if [[ -z $1 || -z $2 ]]; then usage; fi
+        
+        CERT_EMAIL=$1
+        CERT_DOMAIN=$2
+        break ;;
+    * ) break ;;
+  esac
+done
+
+if [[ -z $WEBROOT ]]; then
+    echo 'WEBROOT is unset; falling back to /app'
+    WEBROOT=${WEBROOT:-/app}
+fi
+
+if [[ -e /etc/letsencrypt/live/${CERT_DOMAIN}/fullchain.pem ]]; then
+    echo Certificate already exists, skipping certbot
 else
- certbot certonly --webroot -w $WEBROOT -d $DOMAIN --email $GIT_EMAIL --agree-tos --quiet
- ln -s /etc/nginx/sites-available/default-ssl.conf /etc/nginx/sites-enabled/
+    certbot certonly --webroot -w "$WEBROOT" -d "$CERT_DOMAIN" --email "$CERT_EMAIL" --agree-tos --quiet
+fi
 
- # change nginx for webroot and domain name
- sed -i "s/##DOMAIN##/${DOMAIN}/g" /etc/nginx/sites-enabled/default-ssl.conf
- sed -i "s#root /var/www/html;#root ${WEBROOT};#g" /etc/nginx/sites-available/default-ssl.conf
- if [ ! -z "$WEBROOT" ]; then
-  webroot=$WEBROOT
-  sed -i "s#root /var/www/html;#root ${webroot};#g" /etc/nginx/sites-available/default-ssl.conf
- fi
+if [[ -z $SKIP_NGINX ]]; then
+    if [[ -f $CONF_NGINX_SSL_INCL ]]; then
+        sed -i "s@##CERT_DOMAIN##@${CERT_DOMAIN}@g" $CONF_NGINX_SSL_INCL
+    else
+        echo "Skipped replacing $CONF_NGINX_SSL_INCL, not found"
+    fi
 
- supervisorctl restart nginx
- 
+    if [[ -f $CONF_NGINX_SITE ]]; then
+        sed -i "s@# ##CERT_DOMAIN##@${CERT_DOMAIN}@g" $CONF_NGINX_SITE
+        sed -i "s@#include conf.d/ssl.conf.include;@include conf.d/ssl.conf.include;@g" $CONF_NGINX_SITE
+    else
+        echo "Skipped replacing $CONF_NGINX_SITE, not found"
+    fi
+
+    supervisorctl restart nginx
+else
+    echo Skipping nginx configuration
 fi

@@ -72,13 +72,13 @@ The following variables can be passed either as `docker run ... -e 'NAME=VALUE' 
 
 ```
 
-| Name | Description | Default | Example |
+| Name | Description | Default | Examples |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
-| WEBROOT | Document root for the default nginx site.<br>Applied only if the image is run with default nginx site configuration. | /app | `-e 'WEBROOT=/app/public'`<br>`environment:<br>     - 'WEBROOT=/app/public'` |
-| XDEBUG_CONFIG | Configuration for Xdebug.<br>Though xdebug extension is installed, it is not enabled for performance reasons unless XDEBUG_CONFIG is set.<br>The contents of XDEBUG_CONFIG variable are read by the xdebug extension itself, see [Xdebug documentation](https://xdebug.org/docs/remote#starting) for more info. | not set | `-e 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'`<br>`environment:<br>    - 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'` |
-| PHP_IDE_SERVER_NAME | Server name needed to enable debugging in IDE.<br> Applied only if XDEBUG_CONFIG is set.<br> Unless PHP_IDE_CONFIG is set, this variable will be used to produce `PHP_IDE_CONFIG='serverName=PHP_IDE_SERVER_NAME'` | docker | `-e 'PHP_IDE_SERVER_NAME=site'`<br> `environment:<br>    - 'PHP_IDE_SERVER_NAME=site'` |
+| WEBROOT | Document root for the default nginx site.<br>Applied only if the image is run with default nginx site configuration. | /app | `-e 'WEBROOT=/app/public'`<br><br>`environment:`<br>`     - 'WEBROOT=/app/public'` |
+| XDEBUG_CONFIG | Configuration for Xdebug.<br>Though xdebug extension is installed, it is not enabled for performance reasons unless XDEBUG_CONFIG is set.<br>The contents of XDEBUG_CONFIG variable are read by the xdebug extension itself, see [Xdebug documentation](https://xdebug.org/docs/remote#starting) for more info. | not set | `-e 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'`<br><br>`environment:`<br>`    - 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'` |
+| PHP_IDE_SERVER_NAME | Server name needed to enable debugging in IDE.<br> Applied only if XDEBUG_CONFIG is set.<br> Unless PHP_IDE_CONFIG is set, this variable will be used to produce `PHP_IDE_CONFIG='serverName=PHP_IDE_SERVER_NAME'` | docker | `-e 'PHP_IDE_SERVER_NAME=site'`<br><br>`environment:`<br>`    - 'PHP_IDE_SERVER_NAME=site'` |
 
 ### Links
 - [Github](https://github.com/artsafin/nginx-php-fpm)
-- [Docker hub](https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/)
+- [Docker hub](https://registry.hub.docker.com/u/artsafin/nginx-php-fpm/)
 - [https://github.com/richarvey/nginx-php-fpm](https://github.com/richarvey/nginx-php-fpm)

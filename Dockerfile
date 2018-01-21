@@ -1,5 +1,9 @@
 FROM php:7.1.12-fpm-alpine
 
+EXPOSE 443 80
+
+CMD ["/start.sh"]
+
 LABEL description="The image is used for development in a common LAMP stack" maintainer="Artur Safin <treilor@gmail.com>" version="1.0"
 
 ENV php_exts pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache
@@ -198,9 +202,7 @@ RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repo
     #curl iconv session
     docker-php-ext-install $php_exts && \
     pecl install xdebug && \
-    docker-php-source delete && \
     mkdir -p /etc/nginx && \
-    mkdir -p /var/www/app && \
     mkdir -p /run/nginx && \
     mkdir -p /var/log/supervisor && \
     EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \
@@ -213,31 +215,28 @@ RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repo
     pip install -U certbot && \
     mkdir -p /etc/letsencrypt/webrootauth && \
     apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev make autoconf
-#    ln -s /usr/bin/php7 /usr/bin/php
 
-ADD conf/supervisord.conf /etc/supervisord.conf
-
-# Copy our nginx config
-RUN rm -Rf /etc/nginx/nginx.conf
-ADD conf/nginx.conf /etc/nginx/nginx.conf
-
-# nginx site conf
+# Necessary dirs
 RUN mkdir -p /etc/nginx/conf.d/ && \
 mkdir -p /etc/nginx/ssl/ && \
 mkdir /app/
-ADD conf/default-site.conf ${CONF_NGINX_SITE}
-ADD conf/ssl.conf.include /etc/nginx/conf.d/ssl.conf.include
 
-# tweak php-fpm config
+# php-fpm config
 ADD conf/php-docker-vars.ini /usr/local/etc/php/conf.d/php-docker-vars.ini
 ADD conf/php-fpm-pool.conf /usr/local/etc/php-fpm.d/www.conf
+
+# Supervisord config
+ADD conf/supervisord.conf $CONF_SUPERVISORD
+
+# nginx config
+RUN rm -Rf /etc/nginx/nginx.conf
+ADD conf/nginx/nginx.conf /etc/nginx/nginx.conf
+ADD conf/nginx/default-site.conf ${CONF_NGINX_SITE}
+ADD conf/nginx/common-server.conf.include /etc/nginx/conf.d/common-server.conf.include
+ADD conf/nginx/ssl.conf.include /etc/nginx/conf.d/ssl.conf.include
 
 # Add Scripts
 ADD scripts/start.sh /start.sh
 ADD scripts/letsencrypt-setup /usr/bin/letsencrypt-setup
 ADD scripts/letsencrypt-renew /usr/bin/letsencrypt-renew
 RUN chmod 755 /usr/bin/letsencrypt-setup && chmod 755 /usr/bin/letsencrypt-renew && chmod 755 /start.sh
-
-EXPOSE 443 80
-
-CMD ["/start.sh"]

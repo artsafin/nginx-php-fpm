@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 if [[ -f $CONF_NGINX_SITE ]]; then
   WEBROOT=${WEBROOT:-/app}
 
@@ -34,6 +36,11 @@ if [[ ! -z "$XDEBUG_CONFIG" ]]; then
 else
   echo "Skipping Xdebug configuration (pass XDEBUG_CONFIG environment variable to enable)"
   echo
+fi
+
+if [[ ! -z "$PHP_EXT" ]]; then
+  docker-php-ext-install $PHP_EXT
+  docker-php-ext-enable  $PHP_EXT
 fi
 
 # Start supervisord and services

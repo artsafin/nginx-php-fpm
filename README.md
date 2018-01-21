@@ -22,7 +22,7 @@ docker pull artsafin/nginx-php-fpm:latest
 ### Running standalone image
 To simply run the container:
 ```
-docker run -d -v<FILES>:/app -p80:80 -p443:443 artsafin/nginx-php-fpm
+docker run -d -v$PWD:/app -p80:80 -p443:443 artsafin/nginx-php-fpm:latest
 ```
 
 ### Running image as part of docker-compose
@@ -37,8 +37,10 @@ services:
     image: artsafin/nginx-php-fpm:latest
     restart: always
     environment:
+        - 'WEBROOT=/app/web'
+        - 'PHP_EXT=pcntl'
     volumes:
-        -<FILES>:/app
+        - .:/app
 ```
 
 ## Configuration
@@ -54,7 +56,7 @@ The following files and directories are considered by nginx or php-fpm:
 | /etc/supervisord.conf | conf/supervisord.conf | Supervisord main config |
 | /etc/supervisor/conf.d/ |  | Additional supervisord configuration files (*.conf) |
 | /etc/nginx/nginx.conf | conf/nginx.conf | Nginx main config |
-| /etc/nginx/conf.d/default-site.conf | conf/default-site.conf | Nginx default site config |
+| /etc/nginx/conf.d/default-site.conf | conf/default-site.conf | Nginx default site config ([raw](https://raw.githubusercontent.com/artsafin/nginx-php-fpm/master/conf/default-site.conf)) |
 | /etc/nginx/conf.d/ |  | Additional nginx configuration files (*.conf) |
 | /usr/local/etc/php/conf.d/php-docker-vars.ini | conf/php-docker-vars.ini | php.ini overrides |
 | /usr/local/etc/php/conf.d/ |  | Additional php configuration files (*.ini) |
@@ -63,7 +65,12 @@ The following files and directories are considered by nginx or php-fpm:
 
 ### Environment variables
 
-The following variables can be passed either as `docker run ... -e 'NAME=VALUE' artsafin/nginx-php-fpm` or using `docker-compose.yml`'s `environment` section:
+The following variables can be used to alter the behaviour of the built image.
+
+Variables can be passed in two ways:
+- as `docker run ... -e 'NAME=VALUE' artsafin/nginx-php-fpm`
+- using `environment` section of `docker-compose.yml` file:
+
 ```
 ...
     environment:
@@ -74,9 +81,10 @@ The following variables can be passed either as `docker run ... -e 'NAME=VALUE' 
 
 | Name | Description | Default | Examples |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
-| WEBROOT | Document root for the default nginx site.<br>Applied only if the image is run with default nginx site configuration. | /app | `-e 'WEBROOT=/app/public'`<br><br>`environment:`<br>`     - 'WEBROOT=/app/public'` |
-| XDEBUG_CONFIG | Configuration for Xdebug.<br>Though xdebug extension is installed, it is not enabled for performance reasons unless XDEBUG_CONFIG is set.<br>The contents of XDEBUG_CONFIG variable are read by the xdebug extension itself, see [Xdebug documentation](https://xdebug.org/docs/remote#starting) for more info. | not set | `-e 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'`<br><br>`environment:`<br>`    - 'XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1'` |
-| PHP_IDE_SERVER_NAME | Server name needed to enable debugging in IDE.<br> Applied only if XDEBUG_CONFIG is set.<br> Unless PHP_IDE_CONFIG is set, this variable will be used to produce `PHP_IDE_CONFIG='serverName=PHP_IDE_SERVER_NAME'` | docker | `-e 'PHP_IDE_SERVER_NAME=site'`<br><br>`environment:`<br>`    - 'PHP_IDE_SERVER_NAME=site'` |
+| WEBROOT | Document root for the default nginx site.<br>Applied only if the image is run with default nginx site configuration. | /app | `WEBROOT=/app/public` |
+| XDEBUG_CONFIG | Configuration for Xdebug.<br>Though xdebug extension is installed, it is not enabled for performance reasons unless XDEBUG_CONFIG is set.<br>The contents of XDEBUG_CONFIG variable are read by the xdebug extension itself, see [Xdebug documentation](https://xdebug.org/docs/remote#starting) for more info. | not set | `XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1` |
+| PHP_EXT | A list of PHP extensions that will be installed in addition to the preinstalled extensions. See [this link](https://github.com/php/php-src/tree/PHP-7.1.12/ext) for valid extension names. | not set | `PHP_EXT=pcntl bcmath` |
+| PHP_IDE_SERVER_NAME | Server name needed to enable debugging in IDE.<br> Applied only if XDEBUG_CONFIG is set.<br> Unless PHP_IDE_CONFIG is set, this variable will be used to produce `PHP_IDE_CONFIG='serverName=PHP_IDE_SERVER_NAME'` | docker | `PHP_IDE_SERVER_NAME=site` |
 
 ### Links
 - [Github](https://github.com/artsafin/nginx-php-fpm)

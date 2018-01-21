@@ -55,8 +55,8 @@ The following files and directories are considered by nginx or php-fpm:
 |-----------------------------------------------|--------------------------|-----------------------------------------------------|
 | /etc/supervisord.conf | conf/supervisord.conf | Supervisord main config |
 | /etc/supervisor/conf.d/ |  | Additional supervisord configuration files (*.conf) |
-| /etc/nginx/nginx.conf | conf/nginx.conf | Nginx main config |
-| /etc/nginx/conf.d/default-site.conf | conf/default-site.conf | Nginx default site config ([raw](https://raw.githubusercontent.com/artsafin/nginx-php-fpm/master/conf/default-site.conf)) |
+| /etc/nginx/nginx.conf | conf/nginx/nginx.conf | Nginx main config |
+| /etc/nginx/conf.d/default-site.conf | conf/nginx/default-site.conf | Nginx default site config ([raw](https://raw.githubusercontent.com/artsafin/nginx-php-fpm/master/conf/nginx/default-site.conf)) |
 | /etc/nginx/conf.d/ |  | Additional nginx configuration files (*.conf) |
 | /usr/local/etc/php/conf.d/php-docker-vars.ini | conf/php-docker-vars.ini | php.ini overrides |
 | /usr/local/etc/php/conf.d/ |  | Additional php configuration files (*.ini) |

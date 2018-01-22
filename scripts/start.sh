@@ -1,12 +1,11 @@
 #!/bin/bash
 
-set -ex
+set -e
 
-if [[ -f $CONF_NGINX_SITE ]]; then
+if grep '##WEBROOT##' $CONF_NGINX_SITE > /dev/null; then
   WEBROOT=${WEBROOT:-/app}
 
-  # Set webroot for a default site
-  sed -i "s@##WEBROOT##@${WEBROOT}@g" $CONF_NGINX_SITE
+  echo "$(sed "s@##WEBROOT##@${WEBROOT}@g" $CONF_NGINX_SITE)" > $CONF_NGINX_SITE
 
   echo Webroot is set to ${WEBROOT} in ${CONF_NGINX_SITE}
   echo

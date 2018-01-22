@@ -17,12 +17,6 @@ location =/favicon.ico {
     log_not_found off;
 }
 
-location / {
-    # First attempt to serve request as file, then
-    # as directory, then fall back to index.html
-    try_files $uri $uri/ =404;
-}
-
 # deny access to . files, for security
 #
 location ~ /\. {

@@ -8,7 +8,7 @@ The image installs only necessary software and fully configurable (see below).
 The list of software:
 - nginx 1.13
 - php 7.1
-- PHP extensions: pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache
+- PHP extensions: pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache bcmath
 - composer
 
 Based on [https://github.com/richarvey/nginx-php-fpm](https://github.com/richarvey/nginx-php-fpm)
@@ -83,8 +83,9 @@ Variables can be passed in two ways:
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
 | WEBROOT | Document root for the default nginx site.<br>Applied only if the image is run with default nginx site configuration. | /app | `WEBROOT=/app/public` |
 | XDEBUG_CONFIG | Configuration for Xdebug.<br>Though xdebug extension is installed, it is not enabled for performance reasons unless XDEBUG_CONFIG is set.<br>The contents of XDEBUG_CONFIG variable are read by the xdebug extension itself, see [Xdebug documentation](https://xdebug.org/docs/remote#starting) for more info. | not set | `XDEBUG_CONFIG=remote_enable=1 remote_connect_back=1` |
-| PHP_EXT | A list of PHP extensions that will be installed in addition to the preinstalled extensions. See [this link](https://github.com/php/php-src/tree/PHP-7.1.12/ext) for valid extension names. | not set | `PHP_EXT=pcntl bcmath` |
+| PHP_EXT | A list of PHP extensions that will be installed in addition to the preinstalled extensions. See [this link](https://github.com/php/php-src/tree/PHP-7.1.12/ext) for valid extension names. | not set | `PHP_EXT=pcntl` |
 | PHP_IDE_SERVER_NAME | Server name needed to enable debugging in IDE.<br> Applied only if XDEBUG_CONFIG is set.<br> Unless PHP_IDE_CONFIG is set, this variable will be used to produce `PHP_IDE_CONFIG='serverName=PHP_IDE_SERVER_NAME'` | docker | `PHP_IDE_SERVER_NAME=site` |
+| POST_INIT_RC | Command ran from inside the container before starting nginx and php-fpm. All the environment variables available to command. | not set | `POST_INIT_RC=/app/apprc` |
 
 ### Links
 - [Github](https://github.com/artsafin/nginx-php-fpm)

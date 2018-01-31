@@ -1,4 +1,4 @@
-FROM php:7.1.12-fpm-alpine
+FROM php:7.0-fpm-alpine
 
 EXPOSE 443 80
 
@@ -6,7 +6,7 @@ CMD ["/start.sh"]
 
 LABEL description="The image is used for development in a common LAMP stack" maintainer="Artur Safin <treilor@gmail.com>" version="1.0"
 
-ENV php_exts pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache
+ENV php_exts pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache bcmath
 ENV CONF_NGINX_SITE /etc/nginx/conf.d/default-site.conf
 ENV CONF_NGINX_SSL_INCL /etc/nginx/conf.d/ssl.conf.include
 ENV CONF_SUPERVISORD /etc/supervisord.conf

@@ -42,5 +42,9 @@ if [[ ! -z "$PHP_EXT" ]]; then
   docker-php-ext-enable  $PHP_EXT
 fi
 
+if [[ ! -z "$POST_INIT_RC" ]]; then
+  source $POST_INIT_RC
+fi
+
 # Start supervisord and services
 exec /usr/bin/supervisord -n -c $CONF_SUPERVISORD

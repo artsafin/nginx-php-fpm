@@ -167,6 +167,7 @@ RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repo
     echo /etc/apk/respositories && \
     apk update && \
     apk add --no-cache bash \
+    bison \
     openssh-client \
     wget \
     supervisor \

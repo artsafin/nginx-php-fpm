@@ -7,7 +7,7 @@ The image installs only necessary software and fully configurable (see below).
 
 The list of software:
 - nginx 1.13
-- php 7.1
+- php 7.0
 - PHP extensions: pdo_mysql pdo_sqlite mysqli mcrypt gd exif intl xsl json soap dom zip opcache bcmath
 - composer
 
@@ -16,13 +16,13 @@ Based on [https://github.com/richarvey/nginx-php-fpm](https://github.com/richarv
 ## Quick Start
 To pull from docker hub:
 ```
-docker pull artsafin/nginx-php-fpm:latest
+docker pull artsafin/nginx-php-fpm:7.0
 ```
 
 ### Running standalone image
 To simply run the container:
 ```
-docker run -d -v$PWD:/app -p80:80 -p443:443 artsafin/nginx-php-fpm:latest
+docker run -d -v$PWD:/app -p80:80 -p443:443 artsafin/nginx-php-fpm:7.0
 ```
 
 ### Running image as part of docker-compose
@@ -34,7 +34,7 @@ version: '3'
 
 services:
   nginx-php-fpm:
-    image: artsafin/nginx-php-fpm:latest
+    image: artsafin/nginx-php-fpm:7.0
     restart: always
     environment:
         - 'WEBROOT=/app/web'
